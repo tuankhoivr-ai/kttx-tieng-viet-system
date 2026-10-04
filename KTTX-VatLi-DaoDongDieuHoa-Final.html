@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KTTX Smart Lab - Dao Động Điều Hòa</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0f1d;
+            --bg-2: #101827;
+            --panel: rgba(19, 27, 42, 0.92);
+            --border: rgba(255, 255, 255, 0.08);
+            --text: #edf1f7;
+            --muted: #a7b3c7;
+            --purple: #8b5cf6;
+            --cyan: #22d3ee;
+            --green: #34d399;
+            --amber: #fbbf24;
+            --red: #f87171;
+            --gold: #fbbf24;
+            --formula-bg: rgba(74, 62, 25, 0.9);
+            --formula-text: #f6e7b8;
+            --shadow: 0 18px 60px rgba(3, 7, 18, 0.42);
+        }
+
+        * { 
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html { 
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Manrope', system-ui, sans-serif;
+            background: radial-gradient(circle at top, rgba(139, 92, 246, 0.18), transparent 25%),
+                        linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #7c3aed 0%, #3b82f6 52%, #22d3ee 100%);
+            padding: 28px 0;
+            box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.1), var(--shadow);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 16px;
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .logo-badge {
+            width: 56px;
+            height: 56px;
+            display: grid;
+            place-items: center;
+            font-size: 2.2rem;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 14px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .logo h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -0.05em;
+            color: white;
+        }
+
+        .logo p {
+            margin: 0;
+            font-size: 0.8rem;
+            opacity: 0.85;
+            font-weight: 600;
+        }
+
+        .nav-tabs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 8px;
+        }
+
+        .tab-btn {
+            padding: 12px 16px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.12);
+            color: white;
+            font-weight: 700;
+            font-size: 0.88rem;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(8px);
+        }
+
+        .tab-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .tab-btn.active {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.35);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        .main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px 16px 40px;
+            min-height: calc(100vh - 200px);
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .card {
+            background: rgba(17, 24, 39, 0.9);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 24px;
+            box-shadow: var(--shadow);
+            margin-bottom: 18px;
+            backdrop-filter: blur(10px);
+        }
+
+        .card h2 {
+            margin: 0 0 16px;
+            font-size: 1.12rem;
+            color: #9fe7d0;
+            letter-spacing: 0.02em;
+            font-weight: 800;
+        }
+
+        .formula {
+            display: block;
+            margin: 12px 0 10px;
+            padding: 14px 16px;
+            border-radius: 12px;
+            background: var(--formula-bg);
+            color: var(--formula-text);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.98rem;
+            font-weight: 700;
+            line-height: 1.6;
+            overflow-x: auto;
+        }
+
+        .fdesc {
+            margin: 0 0 12px;
+            color: var(--muted);
+            line-height: 1.7;
+            font-size: 0.95rem;
+        }
+
+        .card ul {
+            margin: 0;
+            padding-left: 20px;
+            color: var(--muted);
+            line-height: 1.85;
+        }
+
+        .card li {
+            margin: 10px 0;
+        }
+
+        .card li strong { 
+            color: #a8e6de;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 14px;
+            margin-top: 18px;
+        }
+
+        .stat-box {
+            padding: 18px 16px;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.02);
+            text-align: center;
+        }
+
+        .stat-box strong {
+            display: block;
+            font-size: 2rem;
+            letter-spacing: -0.05em;
+            background: linear-gradient(135deg, var(--purple), var(--cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 6px;
+        }
+
+        .stat-box span {
+            color: var(--muted);
+            font-size: 0.85rem;
+            display: block;
+        }
+
+        .student-section {
+            margin-bottom: 24px;
+        }
+
+        .input-group {
+            display: grid;
+            grid-template-columns: 1.4fr auto;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        input[type="text"], input[type="email"] {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px 14px;
+            color: var(--text);
+            font: inherit;
+            font-weight: 600;
+        }
+
+        input::placeholder {
+            color: var(--muted);
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--purple), var(--cyan));
+            color: #07121d;
+            border: none;
+            font-weight: 800;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(139, 92, 246, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--text);
+            border: 1.5px solid var(--border);
+        }
+
+        .btn-ghost:hover {
+            border-color: rgba(139, 92, 246, 0.7);
+        }
+
+        .quiz-container {
+            background: rgba(17, 24, 39, 0.9);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .q-tag {
+            display: inline-block;
+            font-size: 0.75rem;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: #9fe7d0;
+            padding: 4px 10px;
+            background: rgba(158, 231, 208, 0.1);
+            border-radius: 6px;
+        }
+
+        .score-display {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: 0.85rem;
+            background: rgba(139, 92, 246, 0.15);
+            padding: 8px 14px;
+            border-radius: 10px;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            font-weight: 800;
+            line-height: 1.65;
+            margin: 16px 0 16px;
+        }
+
+        .options {
+            display: grid;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .option-btn {
+            width: 100%;
+            text-align: left;
+            padding: 13px 16px;
+            border-radius: 12px;
+            border: 1.5px solid var(--border);
+            background: rgba(255, 255, 255, 0.02);
+            color: var(--text);
+            font: inherit;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            border-color: rgba(34, 211, 238, 0.7);
+            background: rgba(34, 211, 238, 0.08);
+            transform: translateX(4px);
+        }
+
+        .option-btn.correct {
+            background: rgba(52, 211, 153, 0.15);
+            border-color: rgba(52, 211, 153, 0.7);
+        }
+
+        .option-btn.wrong {
+            background: rgba(248, 113, 113, 0.12);
+            border-color: rgba(248, 113, 113, 0.7);
+        }
+
+        .option-btn:disabled {
+            cursor: default;
+        }
+
+        .quiz-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        .result-summary {
+            text-align: center;
+            padding: 32px 20px;
+            background: rgba(17, 24, 39, 0.9);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            box-shadow: var(--shadow);
+        }
+
+        .result-label {
+            font-size: 0.85rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: #9fe7d0;
+            margin-bottom: 12px;
+        }
+
+        .result-score {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: clamp(2rem, 10vw, 4rem);
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--purple), var(--cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 16px;
+        }
+
+        .result-details {
+            color: var(--muted);
+            margin-bottom: 20px;
+        }
+
+        .history-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.02);
+            font-size: 0.9rem;
+        }
+
+        .history-item strong {
+            color: var(--text);
+        }
+
+        .history-score {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            color: var(--green);
+        }
+
+        .footer {
+            background: rgba(10, 15, 29, 0.8);
+            border-top: 1px solid var(--border);
+            padding: 20px 16px;
+            text-align: center;
+            color: var(--muted);
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 768px) {
+            .header-top {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .nav-tabs {
+                width: 100%;
+            }
+
+            .input-group {
+                grid-template-columns: 1fr;
+            }
+
+            .tab-btn {
+                font-size: 0.75rem;
+                padding: 10px 12px;
+            }
+
+            .quiz-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .result-score {
+                font-size: clamp(1.6rem, 8vw, 2.8rem);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-top">
+                <div class="logo">
+                    <div class="logo-badge">⚛️</div>
+                    <div>
+                        <h1>KTTX Smart Lab</h1>
+                        <p>Ôn tập Vật Lí 11 - Dao Động Điều Hòa</p>
+                    </div>
+                </div>
+            </div>
+            <div class="nav-tabs">
+                <button class="tab-btn active" data-tab="formulas">📐 Công thức</button>
+                <button class="tab-btn" data-tab="theory">📖 Lý thuyết</button>
+                <button class="tab-btn" data-tab="quiz">📝 Trắc nghiệm</button>
+                <button class="tab-btn" data-tab="history">📊 Lịch sử</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="main container">
+        <!-- CÔNG THỨC -->
+        <section id="formulas" class="section active">
+            <div class="card">
+                <h2>1. Li độ – Chu kì – Tần số</h2>
+                <span class="formula">x = A·cos(ωt + φ)</span>
+                <p class="fdesc">Phương trình li độ của dao động điều hòa. A: biên độ; ω: tần số góc; φ: pha ban đầu</p>
+                
+                <span class="formula">L = 2A</span>
+                <p class="fdesc">Chiều dài quỹ đạo dao động</p>
+                
+                <span class="formula">T = 2π/ω</span>
+                <p class="fdesc">Chu kì dao động (thời gian 1 dao động toàn phần)</p>
+                
+                <span class="formula">f = 1/T = ω/2π</span>
+                <p class="fdesc">Tần số dao động, đơn vị: Hz</p>
+            </div>
+
+            <div class="card">
+                <h2>2. Vận tốc</h2>
+                <span class="formula">v = dx/dt = −ωA·sin(ωt + φ)</span>
+                <p class="fdesc">Vận tốc tức thời. Sớm pha π/2 so với li độ</p>
+                
+                <span class="formula">v_max = ωA</span>
+                <p class="fdesc">Tốc độ cực đại tại vị trí cân bằng</p>
+            </div>
+
+            <div class="card">
+                <h2>3. Gia tốc</h2>
+                <span class="formula">a = dv/dt = −ω²A·cos(ωt + φ) = −ω²x</span>
+                <p class="fdesc">Gia tốc luôn hướng về vị trí cân bằng. Ngược pha với li độ</p>
+                
+                <span class="formula">a_max = ω²A</span>
+                <p class="fdesc">Độ lớn gia tốc cực đại tại biên</p>
+            </div>
+
+            <div class="card">
+                <h2>4. Hệ thức độc lập thời gian</h2>
+                <span class="formula">x²/A² + v²/v_max² = 1</span>
+                <p class="fdesc">Liên hệ giữa li độ và vận tốc</p>
+                
+                <span class="formula">a²/a_max² + v²/v_max² = 1</span>
+                <p class="fdesc">Liên hệ giữa gia tốc và vận tốc</p>
+            </div>
+
+            <div class="card">
+                <h2>5. Quãng đường – Độ lệch pha</h2>
+                <span class="formula">S = n·4A (khi Δt = n·T)</span>
+                <p class="fdesc">Quãng đường đi được trong n chu kì</p>
+                
+                <span class="formula">S = (n+0,5)·4A (khi Δt = (n+0,5)·T)</span>
+                <p class="fdesc">Quãng đường trong thời gian (n+0,5) chu kì</p>
+                
+                <span class="formula">Δφ = 2π·Δt/T</span>
+                <p class="fdesc">Độ lệch pha giữa hai dao động cùng chu kì</p>
+            </div>
+
+            <div class="card">
+                <h2>6. Liên hệ với chuyển động tròn đều</h2>
+                <span class="formula">v = ωR</span>
+                <p class="fdesc">Tốc độ dài của điểm chuyển động tròn. Bán kính R = A</p>
+                
+                <span class="formula">a_ht = ω²R = v²/R</span>
+                <p class="fdesc">Gia tốc hướng tâm tương ứng</p>
+            </div>
+        </section>
+
+        <!-- LÝ THUYẾT -->
+        <section id="theory" class="section">
+            <div class="card">
+                <h2>1. Khái niệm cơ bản</h2>
+                <ul>
+                    <li><strong>Dao động cơ học:</strong> Chuyển động lặp đi lặp lại quanh một vị trí cân bằng xác định.</li>
+                    <li><strong>Vị trí cân bằng:</strong> Vị trí mà vật đứng yên khi không dao động.</li>
+                    <li><strong>Dao động tuần hoàn:</strong> Trạng thái của vật lặp lại như cũ sau những khoảng thời gian bằng nhau.</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h2>2. Dao động điều hòa</h2>
+                <ul>
+                    <li><strong>Định nghĩa:</strong> Dao động tuần hoàn mà li độ của vật là hàm cos (hoặc sin) theo thời gian: x = A·cos(ωt + φ)</li>
+                    <li><strong>A (biên độ):</strong> Giá trị cực đại của li độ, luôn dương</li>
+                    <li><strong>ω (tần số góc):</strong> Đo bằng rad/s, luôn dương</li>
+                    <li><strong>φ (pha ban đầu):</strong> Trạng thái dao động tại t = 0</li>
+                    <li><strong>ωt + φ (pha dao động):</strong> Cho biết trạng thái dao động tại thời điểm t</li>
+                    <li><strong>Quỹ đạo:</strong> Đoạn thẳng có chiều dài 2A</li>
+                    <li><strong>Đồ thị x - t:</strong> Có dạng đường hình sin</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h2>3. Vận tốc và Gia tốc</h2>
+                <ul>
+                    <li><strong>Tại VTCB (x = 0):</strong> Vận tốc cực đại, gia tốc bằng 0</li>
+                    <li><strong>Tại biên (x = ±A):</strong> Vận tốc bằng 0, gia tốc cực đại</li>
+                    <li><strong>Vận tốc sớm pha π/2</strong> so với li độ</li>
+                    <li><strong>Gia tốc ngược pha</strong> với li độ và <strong>sớm pha π/2</strong> so với vận tốc</li>
+                    <li><strong>Vectơ gia tốc luôn hướng về VTCB</strong> (vì F_phục hồi luôn hướng về VTCB)</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h2>4. Liên hệ với chuyển động tròn đều</h2>
+                <ul>
+                    <li>Hình chiếu của một điểm chuyển động tròn đều lên một đường kính là dao động điều hòa</li>
+                    <li>Bán kính quỹ đạo tròn = Biên độ A</li>
+                    <li>Tốc độ góc của chuyển động tròn = Tần số góc ω của dao động</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h2>5. Mẹo giải bài KTTX</h2>
+                <ul>
+                    <li>Luôn xác định rõ trạng thái của vật: vị trí (x), vận tốc (v), chiều chuyển động</li>
+                    <li>Nhớ: <strong>vận tốc cực đại ở VTCB, gia tốc cực đại ở biên</strong></li>
+                    <li>Với các bài liên quan pha: tìm độ lệch pha Δφ = 2π·Δt/T</li>
+                    <li>Quãng đường: phân tích thời gian thành nT hoặc (n+0,5)T</li>
+                    <li>Dùng hệ thức độc lập thời gian để tìm ẩn số nhanh hơn</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- TRẮC NGHIỆM -->
+        <section id="quiz" class="section">
+            <div class="student-section card">
+                <h2>Thông tin học sinh</h2>
+                <div class="input-group">
+                    <input type="text" id="studentName" placeholder="Nhập tên học sinh...">
+                    <button class="btn" onclick="saveStudentName()">Lưu tên</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Thống kê cá nhân</h2>
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <strong id="bestScore">0.0</strong>
+                        <span>Điểm cao nhất</span>
+                    </div>
+                    <div class="stat-box">
+                        <strong id="avgScore">0.0</strong>
+                        <span>Điểm trung bình</span>
+                    </div>
+                    <div class="stat-box">
+                        <strong id="attempts">0</strong>
+                        <span>Lần làm bài</span>
+                    </div>
+                    <div class="stat-box">
+                        <strong id="lastScore">0.0</strong>
+                        <span>Lần gần nhất</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="quizContent" class="quiz-container"></div>
+        </section>
+
+        <!-- LỊCH SỬ -->
+        <section id="history" class="section">
+            <div class="card">
+                <h2>Lịch sử làm bài</h2>
+                <div id="historyList" class="history-list"></div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>© 2026 KTTX Smart Lab · Hệ thống ôn tập chuyên nghiệp · Built for Excellence</p>
+    </footer>
+
+    <script>
+        const QUESTIONS = [
+            { tag: 'Lý thuyết', q: 'Dao động cơ là gì?', opts: ['Chuyển động qua lại quanh vị trí cân bằng', 'Chuyển động thẳng đều', 'Chuyển động tròn đều', 'Chuyển động rơi tự do'], a: 0 },
+            { tag: 'Lý thuyết', q: 'Dao động tuần hoàn là dao động mà:', opts: ['Vật chuyển động đều', 'Trạng thái lặp lại sau khoảng thời gian bằng nhau', 'Vật luôn đứng yên', 'Tốc độ tăng dần'], a: 1 },
+            { tag: 'Lý thuyết', q: 'Dao động điều hòa là dao động mà li độ có dạng:', opts: ['Hàm bậc nhất theo thời gian', 'Hàm lượng giác theo thời gian', 'Hàm mũ theo thời gian', 'Hàm logarit theo thời gian'], a: 1 },
+            { tag: 'Lý thuyết', q: 'Tại vị trí cân bằng của dao động điều hòa, vật có:', opts: ['Vận tốc bằng 0; gia tốc cực đại', 'Vận tốc cực đại; gia tốc bằng 0', 'Vận tốc và gia tốc đều bằng 0', 'Vận tốc và gia tốc đều cực đại'], a: 1 },
+            { tag: 'Lý thuyết', q: 'Tại biên của dao động điều hòa, vật có:', opts: ['Vận tốc cực đại; gia tốc bằng 0', 'Vận tốc bằng 0; gia tốc cực đại', 'Vận tốc bằng gia tốc', 'Cả ba đều đúng'], a: 1 },
+            { tag: 'Lý thuyết', q: 'Trong dao động điều hòa, vận tốc lệch pha với li độ:', opts: ['Cùng pha', 'Ngược pha', 'Sớm pha π/2', 'Trễ pha π/2'], a: 2 },
+            { tag: 'Lý thuyết', q: 'Gia tốc của vật dao động điều hòa:', opts: ['Cùng pha với li độ', 'Ngược pha với li độ', 'Sớm pha π/2 so với li độ', 'Cả B và C đều đúng'], a: 1 },
+            { tag: 'Lý thuyết', q: 'Vì sao vectơ gia tốc luôn hướng về vị trí cân bằng?', opts: ['Vì vật bị hút xuống đất', 'Vì lực phục hồi luôn hướng về VTCB', 'Vì vật luôn chuyển động thẳng', 'Vì không có lực nào tác dụng'], a: 1 },
+            { tag: 'Lý thuyết', q: 'Đồ thị li độ theo thời gian của dao động điều hòa có dạng:', opts: ['Đường thẳng', 'Đường parabol', 'Đường hình sin', 'Đường elip'], a: 2 },
+            { tag: 'Lý thuyết', q: 'Một dao động điều hòa của vật có thể được xem là:', opts: ['Hình chiếu của chuyển động tròn đều lên đường kính', 'Một phần của chuyển động thẳng đều', 'Quỹ đạo tròn đều', 'Chuyển động rơi tự do'], a: 0 },
+            { tag: 'Công thức', q: 'Phương trình li độ của dao động điều hòa là:', opts: ['x = A·cos(ωt + φ)', 'x = A·ωt', 'x = A/ω · cos t', 'x = ω²A·sin t'], a: 0 },
+            { tag: 'Công thức', q: 'Vận tốc cực đại của dao động điều hòa là:', opts: ['v_max = A/ω', 'v_max = ωA', 'v_max = ω²A', 'v_max = A²ω'], a: 1 },
+            { tag: 'Công thức', q: 'Gia tốc cực đại của dao động điều hòa là:', opts: ['a_max = ωA', 'a_max = ω²A', 'a_max = ω/A', 'a_max = A/ω²'], a: 1 },
+            { tag: 'Công thức', q: 'Hệ thức giữa gia tốc và li độ là:', opts: ['a = ω²x', 'a = −ω²x', 'a = −ωx', 'a = x²/ω'], a: 1 },
+            { tag: 'Công thức', q: 'Chu kì T của dao động điều hòa liên hệ với ω theo:', opts: ['T = ω/2π', 'T = 2π/ω', 'T = 2π·ω', 'T = π/ω'], a: 1 },
+            { tag: 'Công thức', q: 'Tần số f liên hệ với ω theo:', opts: ['f = ω/2π', 'f = 2π/ω', 'f = ω²/2π', 'f = 2πω'], a: 0 },
+            { tag: 'Công thức', q: 'Hệ thức độc lập thời gian giữa li độ và vận tốc là:', opts: ['x²/A² + v²/v_max² = 1', 'x²/A² − v²/v_max² = 1', 'x/A + v/v_max = 1', 'x² + v² = A²'], a: 0 },
+            { tag: 'Công thức', q: 'Quãng đường vật đi được sau thời gian Δt = nT là:', opts: ['S = nA', 'S = n·2A', 'S = n·4A', 'S = A²n'], a: 2 },
+            { tag: 'Công thức', q: 'Độ lệch pha Δφ giữa hai dao động cùng chu kì khi lệch nhau thời gian Δt là:', opts: ['Δφ = 2π·Δt/T', 'Δφ = Δt/T', 'Δφ = πΔt/T', 'Δφ = T/2π·Δt'], a: 0 },
+            { tag: 'Công thức', q: 'Trong mối liên hệ với chuyển động tròn đều, tốc độ dài v của điểm trên quỹ đạo tròn là:', opts: ['v = ω²R', 'v = ωR', 'v = R/ω', 'v = 2πR/T'], a: 1 }
+        ];
+
+        const STORAGE_KEY = 'daoDongDieuHoaHistory';
+        const STUDENT_KEY = 'daoDongDieuHoaStudent';
+
+        let currentQuiz = null;
+        let order = [];
+        let qIndex = 0;
+        let correctCount = 0;
+        let answered = false;
+
+        function shuffle(arr) {
+            const copy = [...arr];
+            for (let i = copy.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [copy[i], copy[j]] = [copy[j], copy[i]];
+            }
+            return copy;
+        }
+
+        function saveStudentName() {
+            const name = document.getElementById('studentName').value.trim();
+            if (!name) {
+                alert('Vui lòng nhập tên');
+                return;
+            }
+            localStorage.setItem(STUDENT_KEY, name);
+            alert('Lưu tên thành công: ' + name);
+            updateStats();
+        }
+
+        function startQuiz() {
+            order = shuffle(QUESTIONS.map((_, i) => i)).slice(0, 20);
+            qIndex = 0;
+            correctCount = 0;
+            answered = false;
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const container = document.getElementById('quizContent');
+            if (qIndex >= order.length) {
+                showResult();
+                return;
+            }
+
+            const q = QUESTIONS[order[qIndex]];
+            answered = false;
+
+            let html = `
+                <div class="quiz-header">
+                    <span class="q-tag">${q.tag} · Câu ${qIndex + 1}/${order.length}</span>
+                    <div class="score-display">Điểm: ${(correctCount * 0.5).toFixed(1)} / 10</div>
+                </div>
+                <div class="question-text">${q.q}</div>
+                <div class="options">
+            `;
+
+            q.opts.forEach((opt, i) => {
+                html += `<button class="option-btn" onclick="selectAnswer(${i}, ${order[qIndex]})">${String.fromCharCode(65 + i)}. ${opt}</button>`;
+            });
+
+            html += `
+                </div>
+                <div class="quiz-footer">
+                    <button class="btn btn-ghost" onclick="startQuiz()">↺ Làm lại</button>
+                    <button class="btn" onclick="nextQuestion()" id="nextBtn" disabled>Tiếp tục →</button>
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        function selectAnswer(optIdx, qIdx) {
+            if (answered) return;
+            answered = true;
+
+            const q = QUESTIONS[qIdx];
+            const buttons = document.querySelectorAll('.option-btn');
+
+            buttons.forEach((btn, i) => {
+                btn.disabled = true;
+                if (i === q.a) {
+                    btn.classList.add('correct');
+                } else if (i === optIdx) {
+                    btn.classList.add('wrong');
+                }
+            });
+
+            if (optIdx === q.a) correctCount++;
+
+            document.querySelector('.score-display').textContent = `Điểm: ${(correctCount * 0.5).toFixed(1)} / 10`;
+            document.getElementById('nextBtn').disabled = false;
+        }
+
+        function nextQuestion() {
+            qIndex++;
+            renderQuestion();
+        }
+
+        function showResult() {
+            const score = (correctCount * 0.5).toFixed(1);
+            const container = document.getElementById('quizContent');
+
+            const result = {
+                score: parseFloat(score),
+                correct: correctCount,
+                total: order.length,
+                date: new Date().toLocaleString('vi-VN')
+            };
+
+            const history = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+            history.push(result);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(history.slice(-20)));
+
+            updateStats();
+            updateHistory();
+
+            container.innerHTML = `
+                <div class="result-summary">
+                    <div class="result-label">Kết quả bài làm</div>
+                    <div class="result-score">${score}</div>
+                    <div class="result-details">
+                        <strong>Điểm: ${score} / 10</strong><br>
+                        Đúng: ${correctCount}/${order.length} câu
+                    </div>
+                    <button class="btn" onclick="startQuiz()">Làm lại đề</button>
+                </div>
+            `;
+        }
+
+        function updateStats() {
+            const history = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+            if (history.length === 0) {
+                document.getElementById('bestScore').textContent = '0.0';
+                document.getElementById('avgScore').textContent = '0.0';
+                document.getElementById('attempts').textContent = '0';
+                document.getElementById('lastScore').textContent = '0.0';
+                return;
+            }
+
+            const scores = history.map(x => x.score);
+            const best = Math.max(...scores);
+            const avg = (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1);
+            const last = scores[scores.length - 1];
+
+            document.getElementById('bestScore').textContent = best.toFixed(1);
+            document.getElementById('avgScore').textContent = avg;
+            document.getElementById('attempts').textContent = history.length;
+            document.getElementById('lastScore').textContent = last.toFixed(1);
+        }
+
+        function updateHistory() {
+            const history = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+            const list = document.getElementById('historyList');
+
+            if (history.length === 0) {
+                list.innerHTML = '<p style="color: var(--muted); text-align: center; padding: 20px;">Chưa có lịch sử làm bài</p>';
+                return;
+            }
+
+            list.innerHTML = history
+                .reverse()
+                .map((item, i) => `
+                    <div class="history-item">
+                        <div>
+                            <strong>Lần ${history.length - i}</strong><br>
+                            <span style="color: var(--muted); font-size: 0.85rem;">${item.date}</span>
+                        </div>
+                        <div class="history-score">${item.score.toFixed(1)}/10</div>
+                    </div>
+                `)
+                .join('');
+        }
+
+        // Tab switching
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById(btn.dataset.tab).classList.add('active');
+
+                if (btn.dataset.tab === 'quiz' && !currentQuiz) {
+                    startQuiz();
+                    currentQuiz = true;
+                }
+                if (btn.dataset.tab === 'history') {
+                    updateHistory();
+                }
+            });
+        });
+
+        // Init
+        const saved = localStorage.getItem(STUDENT_KEY);
+        if (saved) document.getElementById('studentName').value = saved;
+        updateStats();
+        updateHistory();
+    </script>
+</body>
+</html>
