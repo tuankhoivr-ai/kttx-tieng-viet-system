@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dao Động Điều Hòa — Ôn Tập KTTX</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0a0f1d;
+        --bg-2: #101827;
+        --panel: rgba(19, 27, 42, 0.92);
+        --border: rgba(255, 255, 255, 0.08);
+        --text: #edf1f7;
+        --muted: #a7b3c7;
+        --purple: #8b5cf6;
+        --cyan: #22d3ee;
+        --green: #34d399;
+        --amber: #fbbf24;
+        --red: #f87171;
+        --formula-bg: rgba(74, 62, 25, 0.9);
+        --formula-text: #f6e7b8;
+        --shadow: 0 18px 60px rgba(3, 7, 18, 0.42);
+      }
+
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      body {
+        margin: 0;
+        font-family: "Manrope", system-ui, sans-serif;
+        background:
+          radial-gradient(circle at top, rgba(139, 92, 246, 0.18), transparent 25%),
+          linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
+        color: var(--text);
+      }
+      a { color: inherit; text-decoration: none; }
+      .container {
+        width: min(1100px, calc(100% - 24px));
+        margin: 0 auto;
+      }
+      .hero {
+        padding: 32px 0 22px;
+        background: linear-gradient(135deg, #7c3aed 0%, #3b82f6 52%, #22d3ee 100%);
+        box-shadow: inset 0 -1px 0 rgba(255,255,255,0.08);
+      }
+      .hero-inner {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .hero-badge {
+        width: 64px;
+        height: 64px;
+        border-radius: 18px;
+        display: grid;
+        place-items: center;
+        font-size: 2rem;
+        background: rgba(255,255,255,0.16);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.18);
+      }
+      .hero-title {
+        margin: 12px 0 6px;
+        font-size: clamp(1.8rem, 6vw, 3.1rem);
+        line-height: 1.08;
+        letter-spacing: -0.05em;
+      }
+      .hero-sub {
+        margin: 0;
+        font-weight: 700;
+        opacity: 0.84;
+      }
+      .hero-card {
+        min-width: 260px;
+        padding: 16px 18px;
+        border-radius: 18px;
+        background: rgba(10, 15, 29, 0.2);
+        border: 1px solid rgba(255,255,255,0.2);
+        backdrop-filter: blur(8px);
+      }
+      .hero-card small {
+        display: block;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: rgba(255,255,255,0.72);
+        margin-bottom: 8px;
+      }
+      .hero-card strong {
+        display: block;
+        font-size: 1.6rem;
+        letter-spacing: -0.04em;
+      }
+      .toolbar {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        background: rgba(10,15,29,0.8);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border);
+      }
+      .tab-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        padding: 10px 0;
+      }
+      .tab-btn {
+        border: 1px solid var(--border);
+        background: transparent;
+        color: var(--muted);
+        border-radius: 12px;
+        padding: 12px 14px;
+        font: inherit;
+        font-weight: 800;
+        cursor: pointer;
+        transition: 0.2s ease;
+      }
+      .tab-btn.active {
+        background: rgba(139, 92, 246, 0.15);
+        color: #d7c6ff;
+        border-color: rgba(139, 92, 246, 0.45);
+      }
+      .content-wrap {
+        max-width: 1080px;
+        margin: 0 auto;
+        padding: 18px 0 40px;
+      }
+      .panel { display: none; }
+      .panel.active { display: block; }
+      .card {
+        background: rgba(17, 24, 39, 0.9);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        padding: 20px 18px;
+        box-shadow: var(--shadow);
+        margin-bottom: 16px;
+      }
+      .card h2 {
+        margin: 0 0 12px;
+        font-size: 1.08rem;
+        color: #9fe7d0;
+        letter-spacing: 0.02em;
+      }
+      .formula {
+        display: block;
+        margin: 10px 0 8px;
+        padding: 12px 14px;
+        border-radius: 12px;
+        background: var(--formula-bg);
+        color: var(--formula-text);
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.96rem;
+        font-weight: 700;
+        line-height: 1.6;
+      }
+      .fdesc {
+        margin: 0 0 10px;
+        color: var(--muted);
+        line-height: 1.7;
+      }
+      .card ul {
+        margin: 0;
+        padding-left: 18px;
+        color: var(--muted);
+        line-height: 1.8;
+      }
+      .card li strong { color: var(--text); }
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 16px;
+      }
+      .stat-box {
+        padding: 16px 14px;
+        border-radius: 14px;
+        border: 1px solid var(--border);
+        background: rgba(255,255,255,0.02);
+      }
+      .stat-box strong {
+        display: block;
+        font-size: 1.8rem;
+        letter-spacing: -0.05em;
+      }
+      .stat-box span {
+        color: var(--muted);
+        font-size: 0.85rem;
+      }
+      .q-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 16px;
+      }
+      .q-tag {
+        display: inline-block;
+        font-size: 0.74rem;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: #9fe7d0;
+      }
+      .score-pill {
+        border: 1px solid var(--border);
+        background: rgba(255,255,255,0.02);
+        border-radius: 999px;
+        padding: 8px 12px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.78rem;
+      }
+      .quiz-box {
+        background: rgba(17, 24, 39, 0.9);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        padding: 18px;
+        box-shadow: var(--shadow);
+      }
+      .question-text {
+        font-size: 1.08rem;
+        font-weight: 800;
+        line-height: 1.65;
+        margin-bottom: 14px;
+      }
+      .opts { display: grid; gap: 10px; }
+      .opt {
+        width: 100%;
+        text-align: left;
+        padding: 12px 14px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: rgba(255,255,255,0.025);
+        color: var(--text);
+        font: inherit;
+        font-weight: 700;
+        cursor: pointer;
+        transition: 0.2s ease;
+      }
+      .opt:hover:not(:disabled) {
+        border-color: rgba(34,211,238,0.7);
+        transform: translateY(-1px);
+      }
+      .opt.correct {
+        background: rgba(52,211,153,0.15);
+        border-color: rgba(52,211,153,0.7);
+      }
+      .opt.wrong {
+        background: rgba(248,113,113,0.12);
+        border-color: rgba(248,113,113,0.7);
+      }
+      .opt:disabled { cursor: default; }
+      .quiz-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-top: 18px;
+        flex-wrap: wrap;
+      }
+      .btn {
+        appearance: none;
+        font: inherit;
+        font-weight: 800;
+        padding: 11px 18px;
+        border-radius: 12px;
+        border: none;
+        cursor: pointer;
+        transition: transform 0.2s ease;
+      }
+      .btn:hover { transform: translateY(-1px); }
+      .btn.primary {
+        background: linear-gradient(135deg, var(--purple), var(--cyan));
+        color: #07121d;
+      }
+      .btn.ghost {
+        background: transparent;
+        color: var(--text);
+        border: 1px solid var(--border);
+      }
+      .btn:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+        transform: none;
+      }
+      .summary-box {
+        text-align: center;
+        padding: 24px 18px;
+        background: rgba(17, 24, 39, 0.9);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        box-shadow: var(--shadow);
+      }
+      .summary-score {
+        font-family: "JetBrains Mono", monospace;
+        font-size: clamp(2.3rem, 8vw, 3.4rem);
+        font-weight: 800;
+        background: linear-gradient(135deg, var(--purple), var(--cyan));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      .student-form {
+        display: grid;
+        grid-template-columns: 1.3fr auto;
+        gap: 10px;
+        margin-top: 12px;
+      }
+      .student-form input {
+        width: 100%;
+        background: rgba(255,255,255,0.02);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 12px 14px;
+        color: var(--text);
+        font: inherit;
+      }
+      .student-form input::placeholder { color: var(--muted); }
+      .tiny {
+        font-size: 0.8rem;
+        color: var(--muted);
+      }
+      @media (max-width: 740px) {
+        .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .student-form { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="hero">
+      <div class="container hero-inner">
+        <div>
+          <div class="hero-badge">⚛️</div>
+          <h1 class="hero-title">Dao Động Điều Hòa</h1>
+          <p class="hero-sub">Vật Lí 11 · Chương 1 · Ôn tập KTTX</p>
+        </div>
+        <div class="hero-card">
+          <small>Trạng thái</small>
+          <strong>20 câu · 10 điểm</strong>
+          <div class="tiny" style="margin-top:6px; opacity:0.8;">Dễ → Trung bình → Khó → Siêu khó</div>
+        </div>
+      </div>
+    </header>
+
+    <nav class="toolbar">
+      <div class="container">
+        <div class="tab-row">
+          <button class="tab-btn active" data-tab="formula-panel">📐 Công thức</button>
+          <button class="tab-btn" data-tab="theory-panel">📖 Lý thuyết</button>
+          <button class="tab-btn" data-tab="quiz-panel">📝 Trắc nghiệm</button>
+        </div>
+      </div>
+    </nav>
+
+    <main class="container content-wrap">
+      <section class="panel active" id="formula-panel">
+        <div class="card">
+          <h2>1. Li độ – Chu kì – Tần số</h2>
+          <span class="formula">x = A·cos(ωt + φ)</span>
+          <p class="fdesc">Phương trình li độ. A: biên độ; ω: tần số góc; φ: pha ban đầu.</p>
+          <span class="formula">L = 2A</span>
+          <p class="fdesc">Chiều dài quỹ đạo dao động.</p>
+          <span class="formula">T = 2π/ω</span>
+          <p class="fdesc">Chu kì dao động.</p>
+          <span class="formula">f = 1/T = ω/2π</span>
+          <p class="fdesc">Tần số dao động, đơn vị Hz.</p>
+        </div>
+
+        <div class="card">
+          <h2>2. Vận tốc</h2>
+          <span class="formula">v = dx/dt = −ωA·sin(ωt + φ)</span>
+          <p class="fdesc">Vận tốc tức thời của vật.</p>
+          <span class="formula">v_max = ωA</span>
+          <p class="fdesc">Tốc độ cực đại ở vị trí cân bằng.</p>
+        </div>
+
+        <div class="card">
+          <h2>3. Gia tốc</h2>
+          <span class="formula">a = dv/dt = −ω²A·cos(ωt + φ) = −ω²x</span>
+          <p class="fdesc">Gia tốc luôn hướng về vị trí cân bằng.</p>
+          <span class="formula">a_max = ω²A</span>
+          <p class="fdesc">Độ lớn gia tốc cực đại ở biên.</p>
+        </div>
+
+        <div class="card">
+          <h2>4. Hệ thức độc lập thời gian</h2>
+          <span class="formula">x²/A² + v²/v_max² = 1</span>
+          <p class="fdesc">Liên hệ giữa li độ và vận tốc.</p>
+          <span class="formula">a²/a_max² + v²/v_max² = 1</span>
+          <p class="fdesc">Liên hệ giữa gia tốc và vận tốc.</p>
+        </div>
+
+        <div class="card">
+          <h2>5. Quãng đường – Độ lệch pha</h2>
+          <span class="formula">S = n·4A</span>
+          <p class="fdesc">Khi thời gian đi được là nT.</p>
+          <span class="formula">S = (n + 0,5)·4A</span>
+          <p class="fdesc">Khi thời gian đi được là (n + 0,5)T.</p>
+          <span class="formula">Δφ = 2π·Δt/T</span>
+          <p class="fdesc">Độ lệch pha giữa hai dao động cùng chu kì.</p>
+        </div>
+
+        <div class="card">
+          <h2>6. Liên hệ với chuyển động tròn đều</h2>
+          <span class="formula">v = ωR</span>
+          <p class="fdesc">Tốc độ dài của điểm trên quỹ đạo tròn. Bán kính R = A.</p>
+          <span class="formula">a_ht = v²/R = ω²R</span>
+          <p class="fdesc">Gia tốc hướng tâm tương ứng.</p>
+        </div>
+      </section>
+
+      <section class="panel" id="theory-panel">
+        <div class="card">
+          <h2>1. Khái niệm dao động cơ học</h2>
+          <ul>
+            <li><strong>Dao động cơ học</strong>: chuyển động lặp lại quanh một vị trí cân bằng.</li>
+            <li><strong>Vị trí cân bằng</strong>: vị trí mà vật đứng yên khi không dao động.</li>
+            <li><strong>Dao động tuần hoàn</strong>: trạng thái lặp lại sau khoảng thời gian bằng nhau.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h2>2. Dao động điều hòa</h2>
+          <ul>
+            <li>Dao động điều hòa là dao động tuần hoàn mà <strong>li độ</strong> là hàm cos hoặc sin theo thời gian.</li>
+            <li>Biểu thức chuẩn: <strong>x = A cos(ωt + φ)</strong>.</li>
+            <li><strong>A</strong>: biên độ. <strong>ω</strong>: tần số góc. <strong>φ</strong>: pha ban đầu.</li>
+            <li>Đồ thị li độ theo thời gian có dạng hình sin hoặc cos.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h2>3. Vận tốc và gia tốc</h2>
+          <ul>
+            <li>Tại <strong>VTCB</strong>: vận tốc cực đại, gia tốc bằng 0.</li>
+            <li>Tại <strong>biên</strong>: vận tốc bằng 0, gia tốc cực đại.</li>
+            <li>Vận tốc <strong>sớm pha π/2</strong> so với li độ.</li>
+            <li>Gia tốc <strong>ngược pha</strong> với li độ.</li>
+            <li>Vectơ gia tốc luôn hướng về <strong>VTCB</strong>.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h2>4. Mối liên hệ với chuyển động tròn đều</h2>
+          <ul>
+            <li>Hình chiếu của một điểm chuyển động tròn đều lên một đường kính cho ta dao động điều hòa.</li>
+            <li>Bán kính quỹ đạo tròn bằng biên độ <strong>A</strong>.</li>
+            <li>Tốc độ góc của chuyển động tròn đều bằng <strong>ω</strong> của dao động điều hòa.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="panel" id="quiz-panel">
+        <div class="card">
+          <h2>Thông tin học sinh</h2>
+          <div class="student-form">
+            <input id="studentNameInput" type="text" placeholder="Nhập tên học sinh..." maxlength="40" />
+            <button class="btn primary" id="saveStudentBtn">Lưu tên</button>
+          </div>
+          <div class="tiny" style="margin-top:8px;">Hệ thống lưu điểm và lịch sử làm bài trên trình duyệt.</div>
+        </div>
+
+        <div class="card">
+          <h2>Thống kê nhanh</h2>
+          <div class="stats-grid">
+            <div class="stat-box">
+              <strong id="statBest">0.0</strong>
+              <span>Điểm cao nhất</span>
+            </div>
+            <div class="stat-box">
+              <strong id="statAvg">0.0</strong>
+              <span>Điểm trung bình</span>
+            </div>
+            <div class="stat-box">
+              <strong id="statAttempts">0</strong>
+              <span>Lần làm</span>
+            </div>
+            <div class="stat-box">
+              <strong id="statLast">0.0</strong>
+              <span>Điểm gần nhất</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="quiz-box" id="quizBox"></div>
+      </section>
+    </main>
+
+    <script>
+      const QUESTIONS = [
+        { tag: 'Lý thuyết', q: 'Dao động cơ là gì?', opts: ['Chuyển động qua lại quanh vị trí cân bằng', 'Chuyển động thẳng đều', 'Chuyển động tròn đều', 'Chuyển động rơi tự do'], a: 0 },
+        { tag: 'Lý thuyết', q: 'Dao động tuần hoàn là dao động mà:', opts: ['Vật chuyển động đều', 'Trạng thái lặp lại sau khoảng thời gian bằng nhau', 'Vật luôn đứng yên', 'Tốc độ tăng dần'], a: 1 },
+        { tag: 'Lý thuyết', q: 'Dao động điều hòa là dao động mà li độ có dạng:', opts: ['Hàm bậc nhất theo thời gian', 'Hàm lượng giác theo thời gian', 'Hàm mũ theo thời gian', 'Hàm logarit theo thời gian'], a: 1 },
+        { tag: 'Lý thuyết', q: 'Tại vị trí cân bằng của dao động điều hòa, vật có:', opts: ['Vận tốc bằng 0; gia tốc cực đại', 'Vận tốc cực đại; gia tốc bằng 0', 'Vận tốc và gia tốc đều bằng 0', 'Vận tốc và gia tốc đều cực đại'], a: 1 },
+        { tag: 'Lý thuyết', q: 'Tại biên của dao động điều hòa, vật có:', opts: ['Vận tốc cực đại; gia tốc bằng 0', 'Vận tốc bằng 0; gia tốc cực đại', 'Vận tốc bằng gia tốc', 'Cả ba đều đúng'], a: 1 },
+        { tag: 'Lý thuyết', q: 'Trong dao động điều hòa, vận tốc lệch pha với li độ:', opts: ['Cùng pha', 'Ngược pha', 'Sớm pha π/2', 'Trễ pha π/2'], a: 2 },
+        { tag: 'Lý thuyết', q: 'Gia tốc của vật dao động điều hòa:', opts: ['Cùng pha với li độ', 'Ngược pha với li độ', 'Sớm pha π/2 so với li độ', 'Cả B và C đều đúng'], a: 1 },
+        { tag: 'Lý thuyết', q: 'Vì sao vectơ gia tốc luôn hướng về vị trí cân bằng?', opts: ['Vì vật bị hút xuống đất', 'Vì lực phục hồi luôn hướng về VTCB', 'Vì vật luôn chuyển động thẳng', 'Vì không có lực nào tác dụng'], a: 1 },
+        { tag: 'Lý thuyết', q: 'Đồ thị li độ theo thời gian của dao động điều hòa có dạng:', opts: ['Đường thẳng', 'Đường parabol', 'Đường hình sin', 'Đường elip'], a: 2 },
+        { tag: 'Lý thuyết', q: 'Một dao động điều hòa của vật có thể được xem là:', opts: ['Hình chiếu của chuyển động tròn đều lên đường kính', 'Một phần của chuyển động thẳng đều', 'Quỹ đạo tròn đều', 'Chuyển động rơi tự do'], a: 0 },
+        { tag: 'Công thức', q: 'Phương trình li độ của dao động điều hòa là:', opts: ['x = A·cos(ωt + φ)', 'x = A·ωt', 'x = A/ω · cos t', 'x = ω²A·sin t'], a: 0 },
+        { tag: 'Công thức', q: 'Vận tốc cực đại của dao động điều hòa là:', opts: ['v_max = A/ω', 'v_max = ωA', 'v_max = ω²A', 'v_max = A²ω'], a: 1 },
+        { tag: 'Công thức', q: 'Gia tốc cực đại của dao động điều hòa là:', opts: ['a_max = ωA', 'a_max = ω²A', 'a_max = ω/A', 'a_max = A/ω²'], a: 1 },
+        { tag: 'Công thức', q: 'Hệ thức giữa gia tốc và li độ là:', opts: ['a = ω²x', 'a = −ω²x', 'a = −ωx', 'a = x²/ω'], a: 1 },
+        { tag: 'Công thức', q: 'Chu kì T của dao động điều hòa liên hệ với ω theo:', opts: ['T = ω/2π', 'T = 2π/ω', 'T = 2π·ω', 'T = π/ω'], a: 1 },
+        { tag: 'Công thức', q: 'Tần số f liên hệ với ω theo:', opts: ['f = ω/2π', 'f = 2π/ω', 'f = ω²/2π', 'f = 2πω'], a: 0 },
+        { tag: 'Công thức', q: 'Hệ thức độc lập thời gian giữa li độ và vận tốc là:', opts: ['x²/A² + v²/v_max² = 1', 'x²/A² − v²/v_max² = 1', 'x/A + v/v_max = 1', 'x² + v² = A²'], a: 0 },
+        { tag: 'Công thức', q: 'Quãng đường vật đi được sau thời gian Δt = nT là:', opts: ['S = nA', 'S = n·2A', 'S = n·4A', 'S = A²n'], a: 2 },
+        { tag: 'Công thức', q: 'Độ lệch pha Δφ giữa hai dao động cùng chu kì khi lệch nhau thời gian Δt là:', opts: ['Δφ = 2π·Δt/T', 'Δφ = Δt/T', 'Δφ = πΔt/T', 'Δφ = T/2π·Δt'], a: 0 },
+        { tag: 'Công thức', q: 'Trong mối liên hệ với chuyển động tròn đều, nếu bán kính quỹ đạo là R thì tốc độ dài của điểm trên quỹ đạo là:', opts: ['v = ω²R', 'v = ωR', 'v = R/ω', 'v = 2πR/T'], a: 1 }
+      ];
+
+      const STORAGE_KEY = 'daoDongDieuHoaKttxHistory';
+      const STUDENT_KEY = 'daoDongDieuHoaKttxStudent';
+      let order = [];
+      let index = 0;
+      let correctCount = 0;
+      let answered = false;
+
+      function shuffle(arr) {
+        const copy = [...arr];
+        for (let i = copy.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [copy[i], copy[j]] = [copy[j], copy[i]];
+        }
+        return copy;
+      }
+
+      function startQuiz() {
+        order = shuffle(QUESTIONS.map((_, i) => i));
+        index = 0;
+        correctCount = 0;
+        answered = false;
+        renderQuestion();
+      }
+
+      function renderQuestion() {
+        const quizBox = document.getElementById('quizBox');
+        if (index >= order.length) {
+          renderResult();
+          return;
+        }
+
+        const item = QUESTIONS[order[index]];
+        answered = false;
+
+        quizBox.innerHTML = `
+          <div class="q-top">
+            <span class="q-tag">${item.tag} · Câu ${index + 1}/${order.length}</span>
+            <span class="score-pill">Điểm: ${(correctCount * 0.5).toFixed(1)} / 10</span>
+          </div>
+          <div class="question-text">${item.q}</div>
+          <div class="opts" id="optsWrap"></div>
+          <div class="quiz-actions">
+            <button class="btn ghost" id="resetBtn">↺ Làm lại</button>
+            <button class="btn primary" id="nextBtn" disabled>Tiếp tục →</button>
+          </div>
+        `;
+
+        const optsWrap = document.getElementById('optsWrap');
+        item.opts.forEach((opt, optIndex) => {
+          const btn = document.createElement('button');
+          btn.className = 'opt';
+          btn.type = 'button';
+          btn.textContent = `${String.fromCharCode(65 + optIndex)}. ${opt}`;
+          btn.onclick = () => selectAnswer(optIndex, item);
+          optsWrap.appendChild(btn);
+        });
+
+        document.getElementById('resetBtn').onclick = startQuiz;
+        document.getElementById('nextBtn').onclick = () => {
+          index += 1;
+          renderQuestion();
+        };
+      }
+
+      function selectAnswer(selectedIndex, item) {
+        if (answered) return;
+        answered = true;
+
+        const optionButtons = document.querySelectorAll('#optsWrap .opt');
+        optionButtons.forEach((btn, idx) => {
+          btn.disabled = true;
+          if (idx === item.a) btn.classList.add('correct');
+          else if (idx === selectedIndex) btn.classList.add('wrong');
+        });
+
+        if (selectedIndex === item.a) correctCount += 1;
+
+        document.querySelector('.score-pill').textContent = `Điểm: ${(correctCount * 0.5).toFixed(1)} / 10`;
+        document.getElementById('nextBtn').disabled = false;
+      }
+
+      function renderResult() {
+        const quizBox = document.getElementById('quizBox');
+        const finalScore = Number((correctCount * 0.5).toFixed(1));
+        const total = QUESTIONS.length;
+
+        const attempts = getHistory();
+        const newEntry = {
+          score: finalScore,
+          correct: correctCount,
+          total,
+          date: new Date().toLocaleString('vi-VN')
+        };
+
+        const updatedHistory = [...attempts, newEntry].slice(-10);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedHistory));
+        renderStats();
+
+        quizBox.innerHTML = `
+          <div class="summary-box">
+            <div style="font-size:0.82rem; letter-spacing:0.12em; text-transform:uppercase; color:#9fe7d0; margin-bottom:8px;">Kết quả</div>
+            <div class="summary-score">${finalScore.toFixed(1)} / 10</div>
+            <div style="margin-top:12px; color:var(--muted);">Bạn đúng ${correctCount}/${total} câu</div>
+            <button class="btn primary" id="againBtn" style="margin-top:16px;">Làm lại đề</button>
+          </div>
+        `;
+
+        document.getElementById('againBtn').onclick = startQuiz;
+      }
+
+      function getHistory() {
+        try {
+          return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+        } catch {
+          return [];
+        }
+      }
+
+      function renderStats() {
+        const history = getHistory();
+        const scores = history.map(item => Number(item.score || 0));
+        const best = scores.length ? Math.max(...scores) : 0;
+        const avg = scores.length ? (scores.reduce((sum, x) => sum + x, 0) / scores.length) : 0;
+        const last = scores.length ? scores[scores.length - 1] : 0;
+        document.getElementById('statBest').textContent = best.toFixed(1);
+        document.getElementById('statAvg').textContent = avg.toFixed(1);
+        document.getElementById('statAttempts').textContent = String(history.length);
+        document.getElementById('statLast').textContent = last.toFixed(1);
+      }
+
+      function saveStudentName() {
+        const input = document.getElementById('studentNameInput');
+        const value = input.value.trim();
+        if (!value) {
+          input.focus();
+          return;
+        }
+        localStorage.setItem(STUDENT_KEY, value);
+        alert(`Đã lưu tên học sinh: ${value}`);
+      }
+
+      document.querySelectorAll('.tab-btn').forEach((tab) => {
+        tab.addEventListener('click', () => {
+          document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+          document.querySelectorAll('.panel').forEach(panel => panel.classList.remove('active'));
+          tab.classList.add('active');
+          document.getElementById(tab.dataset.tab).classList.add('active');
+        });
+      });
+
+      document.getElementById('saveStudentBtn').onclick = saveStudentName;
+      const savedName = localStorage.getItem(STUDENT_KEY) || '';
+      if (savedName) {
+        document.getElementById('studentNameInput').value = savedName;
+      }
+
+      renderStats();
+      startQuiz();
+    </script>
+  </body>
+</html>
